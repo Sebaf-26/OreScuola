@@ -1,0 +1,16 @@
+services:
+  orescuola:
+    build: .
+    # Built from this repo, never pulled from a registry.
+    pull_policy: build
+    container_name: orescuola-app
+    ports:
+      - "${PORT:-8092}:3000"
+    environment:
+      - TZ=Europe/Rome
+    volumes:
+      - orescuola-data:/data
+    restart: unless-stopped
+
+volumes:
+  orescuola-data:

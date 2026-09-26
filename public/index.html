@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ore Funzionali</title>
+  <meta name="theme-color" content="#2b4c7e">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <h1>Ore Funzionali</h1>
+        <p class="sub">Attività funzionali all'insegnamento · CCNL art. 29</p>
+      </div>
+      <div class="top-actions">
+        <label class="sr" for="anno">Anno scolastico</label>
+        <select id="anno"></select>
+        <button type="button" class="ghost" id="btn-impostazioni" aria-haspopup="dialog">Limiti</button>
+      </div>
+    </header>
+
+    <section class="meters" aria-label="Riepilogo monte ore">
+      <article class="meter" id="meter-A"></article>
+      <article class="meter" id="meter-B"></article>
+      <p class="fuori" id="fuori"></p>
+    </section>
+
+    <section class="card" aria-labelledby="form-title">
+      <h2 id="form-title">Nuovo impegno</h2>
+      <form id="form" novalidate>
+        <div class="grid">
+          <div class="field span-2">
+            <label for="tipo">Cosa</label>
+            <select id="tipo" required></select>
+            <small class="hint" id="tipo-hint"></small>
+          </div>
+          <div class="field span-2">
+            <label for="classe">Classe</label>
+            <input id="classe" list="classi" autocomplete="off" placeholder="es. 3B" maxlength="40">
+            <datalist id="classi"></datalist>
+          </div>
+          <div class="field span-2">
+            <label for="data">Data</label>
+            <input id="data" type="date" required>
+          </div>
+          <div class="field">
+            <label for="inizio">Inizio</label>
+            <input id="inizio" type="time" required step="300">
+          </div>
+          <div class="field">
+            <label for="fine">Fine</label>
+            <input id="fine" type="time" required step="300">
+          </div>
+          <div class="field span-4">
+            <label for="note">Note <span class="opt">(facoltative)</span></label>
+            <input id="note" maxlength="300" placeholder="es. convocazione straordinaria">
+          </div>
+        </div>
+        <div class="form-foot">
+          <p class="durata" id="durata" aria-live="polite"></p>
+          <p class="errore" id="errore" role="alert"></p>
+          <div class="form-buttons">
+            <button type="button" class="ghost" id="annulla" hidden>Annulla</button>
+            <button type="submit" class="primary" id="salva">Aggiungi</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="classi-title" id="sez-classi">
+      <h2 id="classi-title">Per classe</h2>
+      <div class="table-wrap">
+        <table class="per-classe">
+          <thead><tr><th scope="col">Classe</th><th scope="col">Consigli</th><th scope="col">Collegio e altro</th><th scope="col">Scrutini/esami</th><th scope="col">Totale</th></tr></thead>
+          <tbody id="per-classe"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="elenco-title">
+      <div class="elenco-head">
+        <h2 id="elenco-title">Elenco impegni</h2>
+        <div class="elenco-tools">
+          <label class="sr" for="filtro">Filtra</label>
+          <select id="filtro">
+            <option value="">Tutti</option>
+            <option value="A">Collegio e programmazione</option>
+            <option value="B">Consigli di classe</option>
+            <option value="X">Fuori monte ore</option>
+          </select>
+          <button type="button" class="ghost" id="csv">Esporta CSV</button>
+        </div>
+      </div>
+      <div id="elenco"></div>
+    </section>
+
+    <footer class="foot">
+      Lettera a) fino a 40 ore: collegio docenti, programmazione e verifica, informazione alle famiglie.
+      Lettera b) fino a 40 ore: consigli di classe, interclasse e intersezione.
+      Scrutini ed esami non rientrano nei due monte ore.
+    </footer>
+  </div>
+
+  <dialog id="dlg-impostazioni" aria-labelledby="dlg-title">
+    <form method="dialog" id="form-impostazioni">
+      <h2 id="dlg-title">Limiti annuali</h2>
+      <p class="dlg-text">Il massimo è 40 ore ciascuno. Se sei in part-time il limite si riduce in proporzione all'orario.</p>
+      <div class="field">
+        <label for="limiteA">Collegio e programmazione (ore)</label>
+        <input id="limiteA" type="number" min="0" max="200" step="0.5" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="limiteB">Consigli di classe (ore)</label>
+        <input id="limiteB" type="number" min="0" max="200" step="0.5" inputmode="decimal">
+      </div>
+      <div class="form-buttons">
+        <button type="submit" value="cancel" class="ghost">Chiudi</button>
+        <button type="submit" value="ok" class="primary">Salva</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

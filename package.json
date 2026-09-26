@@ -1,0 +1,11 @@
+{
+  "name": "orescuola",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Conteggio delle ore funzionali all'insegnamento (40+40 ore, CCNL art. 29)",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "DATA_DIR=./data node server.js"
+  }
+}

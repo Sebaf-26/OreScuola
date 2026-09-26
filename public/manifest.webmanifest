@@ -1,0 +1,9 @@
+{
+  "name": "Ore Funzionali",
+  "short_name": "Ore",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f4ef",
+  "theme_color": "#2b4c7e",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
