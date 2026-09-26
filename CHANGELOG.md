@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.1] - 2026-09-26
+
+- Fix: dopo un aggiornamento il browser o Cloudflare potevano servire `style.css` e `app.js` vecchi insieme all'HTML nuovo, e la pagina si rompeva (tipi in lista di testo, riepiloghi vuoti). Ora CSS e JS hanno nel link un numero di versione che cambia a ogni deploy, e l'HTML non viene mai messo in cache
+- Fix: il campo nota e il pulsante "Annulla" comparivano anche quando dovevano restare nascosti
+
 ## [1.1.0] - 2026-09-26
 
 Inserimento più semplice.

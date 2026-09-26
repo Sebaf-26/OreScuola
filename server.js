@@ -28,6 +28,11 @@ const TYPES = {
   ".ico": "image/x-icon"
 };
 
+// Stamped into index.html as ?v= on CSS/JS so a redeploy is never masked by a
+// proxy/CDN cache (Cloudflare keeps .js/.css by extension).
+const pkg = JSON.parse(await readFile(join(fileURLToPath(new URL(".", import.meta.url)), "package.json"), "utf8"));
+const BUILD = `${pkg.version}-${Date.now().toString(36)}`;
+
 const DEFAULT_SETTINGS = { limiteA: 40, limiteB: 40 };
 
 let db = { entries: [], settings: { ...DEFAULT_SETTINGS } };
@@ -164,10 +169,13 @@ async function serveStatic(req, res, url) {
   }
 
   try {
-    const body = await readFile(file);
+    let body = await readFile(file);
+    const ext = extname(file);
+    if (ext === ".html") body = body.toString("utf8").replaceAll("__V__", BUILD);
     res.writeHead(200, {
-      "Content-Type": TYPES[extname(file)] || "application/octet-stream",
-      "Cache-Control": "no-cache"
+      "Content-Type": TYPES[ext] || "application/octet-stream",
+      // HTML must never be cached; CSS/JS are versioned via ?v= so they can be.
+      "Cache-Control": ext === ".html" ? "no-store" : url.searchParams.has("v") ? "public, max-age=31536000, immutable" : "no-cache"
     });
     res.end(body);
   } catch {
