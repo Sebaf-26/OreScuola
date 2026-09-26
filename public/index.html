@@ -36,31 +36,38 @@
     <section class="card" aria-labelledby="form-title">
       <h2 id="form-title">Nuovo impegno</h2>
       <form id="form" novalidate>
-        <div class="grid">
-          <div class="field span-2">
-            <label for="tipo">Cosa</label>
-            <select id="tipo" required></select>
-            <small class="hint" id="tipo-hint"></small>
-          </div>
-          <div class="field span-2">
-            <label for="classe">Classe</label>
-            <input id="classe" list="classi" autocomplete="off" placeholder="es. 3B" maxlength="40">
-            <datalist id="classi"></datalist>
-          </div>
-          <div class="field span-2">
-            <label for="data">Data</label>
-            <input id="data" type="date" required>
-          </div>
-          <div class="field">
-            <label for="inizio">Inizio</label>
-            <input id="inizio" type="time" required step="300">
-          </div>
-          <div class="field">
-            <label for="fine">Fine</label>
-            <input id="fine" type="time" required step="300">
-          </div>
-          <div class="field span-4">
-            <label for="note">Note <span class="opt">(facoltative)</span></label>
+        <div class="steps">
+          <fieldset class="step">
+            <legend>Cosa</legend>
+            <div class="pills" id="tipo" role="radiogroup"></div>
+          </fieldset>
+          <fieldset class="step">
+            <legend><label for="classe">Classe</label></legend>
+            <div class="pills" id="classi-pills"></div>
+            <input id="classe" autocomplete="off" placeholder="Scrivi una classe nuova, es. 3B" maxlength="40">
+          </fieldset>
+          <fieldset class="step">
+            <legend>Quando</legend>
+            <div class="pills" id="giorni-pills"></div>
+            <div class="orari">
+              <div class="field">
+                <label for="data">Data</label>
+                <input id="data" type="date" required>
+              </div>
+              <div class="field">
+                <label for="inizio">Inizio</label>
+                <input id="inizio" type="time" required step="300">
+              </div>
+              <div class="field">
+                <label for="fine">Fine</label>
+                <input id="fine" type="time" required step="300">
+              </div>
+            </div>
+            <div class="pills small" id="durate-pills" aria-label="Durata rapida"></div>
+          </fieldset>
+          <button type="button" class="link" id="btn-nota">+ Aggiungi una nota</button>
+          <div class="field" id="campo-nota" hidden>
+            <label for="note">Nota</label>
             <input id="note" maxlength="300" placeholder="es. convocazione straordinaria">
           </div>
         </div>

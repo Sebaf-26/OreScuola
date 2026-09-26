@@ -150,6 +150,26 @@ button {
 .field label { font-size: .85rem; font-weight: 700; }
 .opt { font-weight: 400; color: var(--muted); }
 .hint { color: var(--muted); font-size: .8rem; }
+.steps { display: grid; gap: 18px; }
+.step { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; min-width: 0; }
+.step legend { padding: 0; margin-bottom: 8px; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pills:empty { display: none; }
+.pill {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-weight: 700;
+}
+.pill:hover { border-color: var(--muted); }
+.pill[aria-checked="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.pill.B[aria-checked="true"] { background: var(--b); border-color: var(--b); }
+.pill.X[aria-checked="true"] { background: var(--x); border-color: var(--x); color: var(--surface); }
+.pills.small .pill { min-height: 36px; padding: 4px 12px; font-size: .88rem; }
+.orari { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 10px; }
+.link { background: none; border: 0; padding: 0; min-height: 32px; color: var(--accent); justify-self: start; }
 .form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: 14px; }
 .durata { margin: 0; font-weight: 700; }
 .errore { margin: 0; color: var(--over); flex: 1 1 200px; }
@@ -228,6 +248,8 @@ dialog form { display: grid; gap: 14px; }
   .meters { grid-template-columns: 1fr; }
   .grid { grid-template-columns: 1fr 1fr; }
   .span-2 { grid-column: 1 / -1; }
+  .orari { grid-template-columns: 1fr 1fr; }
+  .orari .field:first-child { grid-column: 1 / -1; }
   .riga { grid-template-columns: 3.4rem 1fr; }
   .azioni { grid-column: 2; }
 }

@@ -1,25 +1,20 @@
 // Ore Funzionali — frontend. Bucket A = art. 29 c.3 lett. a (collegio & co.),
 // B = lett. b (consigli di classe), X = outside both 40-hour caps.
 const TIPI = {
-  consiglio:      { label: "Consiglio di classe",           bucket: "B" },
-  collegio:       { label: "Collegio docenti",              bucket: "A" },
-  dipartimento:   { label: "Riunione di dipartimento",      bucket: "A" },
-  programmazione: { label: "Programmazione e verifica",     bucket: "A" },
-  famiglie:       { label: "Incontro con le famiglie",      bucket: "A" },
-  scrutinio:      { label: "Scrutinio",                     bucket: "X" },
-  esame:          { label: "Esame",                         bucket: "X" },
-  altro:          { label: "Altro (fuori monte ore)",       bucket: "X" }
-};
-const BUCKET_HINT = {
-  A: "Conta nelle 40 ore di collegio e programmazione",
-  B: "Conta nelle 40 ore di consigli di classe",
-  X: "Non conta in nessuno dei due monte ore"
+  consiglio:      { label: "Consiglio di classe",       short: "Consiglio",      bucket: "B" },
+  collegio:       { label: "Collegio docenti",          short: "Collegio",       bucket: "A" },
+  dipartimento:   { label: "Riunione di dipartimento",  short: "Dipartimento",   bucket: "A" },
+  programmazione: { label: "Programmazione e verifica", short: "Programmazione", bucket: "A" },
+  famiglie:       { label: "Incontro con le famiglie",  short: "Famiglie",       bucket: "A" },
+  scrutinio:      { label: "Scrutinio",                 short: "Scrutinio",      bucket: "X" },
+  esame:          { label: "Esame",                     short: "Esame",          bucket: "X" },
+  altro:          { label: "Altro (fuori monte ore)",   short: "Altro",          bucket: "X" }
 };
 const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
 const GIORNI = ["dom", "lun", "mar", "mer", "gio", "ven", "sab"];
 
 const $ = (id) => document.getElementById(id);
-const state = { entries: [], settings: { limiteA: 40, limiteB: 40 }, anno: null, editing: null };
+const state = { entries: [], settings: { limiteA: 40, limiteB: 40 }, anno: null, editing: null, tipo: "consiglio" };
 
 // ---------- helpers ----------
 const toMin = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
@@ -176,56 +171,117 @@ function renderElenco() {
   box.replaceChildren(...out);
 }
 
-function renderClassiSuggerite() {
-  const classi = [...new Set(state.entries.map((e) => e.classe).filter(Boolean))].sort((a, b) => a.localeCompare(b, "it", { numeric: true }));
-  $("classi").replaceChildren(...classi.map((c) => el("option", { value: c })));
-}
-
 function render() {
   renderAnni();
   renderSummary();
   renderPerClasse();
   renderElenco();
-  renderClassiSuggerite();
+  renderPills();
 }
 
 // ---------- form ----------
-function aggiornaDurata() {
-  const i = $("inizio").value, f = $("fine").value;
-  const out = $("durata");
-  if (i && f && toMin(f) > toMin(i)) out.textContent = `Durata: ${fmt(toMin(f) - toMin(i))}`;
-  else out.textContent = "";
-  $("tipo-hint").textContent = BUCKET_HINT[TIPI[$("tipo").value].bucket];
+const DURATE = [30, 45, 60, 90, 120];
+const fromMin = (m) => `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+function spostaGiorni(dateStr, n) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const x = new Date(y, m - 1, d + n);
+  return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
 }
 
-function resetForm() {
+function pill(label, checked, onclick, cls = "") {
+  return el("button", { type: "button", class: `pill ${cls}`, role: "radio", "aria-checked": String(checked), onclick }, label);
+}
+
+// Classes used most recently first, so the ones from this round of consigli are at hand.
+function classiRecenti() {
+  const seen = new Map();
+  for (const e of [...state.entries].sort((a, b) => (b.data + b.inizio).localeCompare(a.data + a.inizio))) {
+    if (e.classe && !seen.has(e.classe)) seen.set(e.classe, true);
+  }
+  return [...seen.keys()].slice(0, 12).sort((a, b) => a.localeCompare(b, "it", { numeric: true }));
+}
+
+function renderPills() {
+  $("tipo").replaceChildren(...Object.entries(TIPI).map(([k, t]) =>
+    pill(t.short, state.tipo === k, () => { state.tipo = k; renderPills(); }, t.bucket)));
+
+  const classe = $("classe").value.trim();
+  $("classi-pills").replaceChildren(...classiRecenti().map((c) =>
+    pill(c, c === classe, () => { $("classe").value = c === classe ? "" : c; renderPills(); })));
+
+  const data = $("data").value, o = oggi();
+  $("giorni-pills").replaceChildren(
+    pill("Oggi", data === o, () => { $("data").value = o; renderPills(); }),
+    pill("Ieri", data === spostaGiorni(o, -1), () => { $("data").value = spostaGiorni(o, -1); renderPills(); })
+  );
+
+  const i = $("inizio").value, f = $("fine").value;
+  const dur = i && f ? toMin(f) - toMin(i) : null;
+  $("durate-pills").replaceChildren(...DURATE.map((m) =>
+    pill(fmt(m), dur === m, () => impostaDurata(m))));
+
+  $("durata").textContent = dur > 0 ? `Durata: ${fmt(dur)}` : "";
+}
+
+function impostaDurata(m) {
+  const i = $("inizio").value;
+  if (!i) {
+    $("errore").textContent = "Prima scegli l'ora di inizio.";
+    $("inizio").focus();
+    return;
+  }
+  $("fine").value = fromMin(Math.min(toMin(i) + m, 23 * 60 + 55));
+  $("errore").textContent = "";
+  renderPills();
+}
+
+function mostraNota(show) {
+  $("campo-nota").hidden = !show;
+  $("btn-nota").hidden = show;
+}
+
+// After adding, keep type and date and chain the next slot on from the last one:
+// consigli di classe usually run back to back with the same length.
+function prossimo(saved) {
   state.editing = null;
-  const tipo = $("tipo").value;
-  $("form").reset();
-  $("tipo").value = tipo; // keep last type: consigli usually come in a row
-  $("data").value = oggi();
+  $("classe").value = "";
+  $("note").value = "";
+  mostraNota(false);
+  if (saved) {
+    const len = durata(saved);
+    $("inizio").value = saved.fine;
+    $("fine").value = fromMin(Math.min(toMin(saved.fine) + len, 23 * 60 + 55));
+    if ($("fine").value <= $("inizio").value) $("fine").value = "";
+  }
   $("form-title").textContent = "Nuovo impegno";
   $("salva").textContent = "Aggiungi";
   $("annulla").hidden = true;
   $("errore").textContent = "";
-  aggiornaDurata();
+  renderPills();
+}
+
+function resetForm() {
+  state.editing = null;
+  $("form").reset();
+  $("data").value = oggi();
+  prossimo(null);
 }
 
 function modifica(e) {
   state.editing = e.id;
-  $("tipo").value = e.tipo;
+  state.tipo = e.tipo;
   $("classe").value = e.classe;
   $("data").value = e.data;
   $("inizio").value = e.inizio;
   $("fine").value = e.fine;
   $("note").value = e.note || "";
+  mostraNota(Boolean(e.note));
   $("form-title").textContent = "Modifica impegno";
   $("salva").textContent = "Salva modifiche";
   $("annulla").hidden = false;
   $("errore").textContent = "";
-  aggiornaDurata();
-  $("form").scrollIntoView({ behavior: "smooth", block: "center" });
-  $("classe").focus({ preventScroll: true });
+  renderPills();
+  $("form").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function confermaElimina(btn, e) {
@@ -253,7 +309,7 @@ async function elimina(e) {
 async function salva(ev) {
   ev.preventDefault();
   const body = {
-    tipo: $("tipo").value,
+    tipo: state.tipo,
     classe: $("classe").value.trim(),
     data: $("data").value,
     inizio: $("inizio").value,
@@ -272,13 +328,15 @@ async function salva(ev) {
       const saved = await api(`/api/entries/${state.editing}`, { method: "PUT", body });
       state.entries = state.entries.map((x) => (x.id === saved.id ? saved : x));
       toast("Modifiche salvate");
+      state.anno = annoDi(body.data);
+      resetForm();
     } else {
       const saved = await api("/api/entries", { method: "POST", body });
       state.entries.push(saved);
-      toast(`Aggiunto: ${fmt(durata(saved))}`);
+      toast(`Aggiunto ${saved.classe || TIPI[saved.tipo].short}: ${fmt(durata(saved))}`);
+      state.anno = annoDi(body.data);
+      prossimo(saved);
     }
-    state.anno = annoDi(body.data);
-    resetForm();
     render();
   } catch (e) {
     err.textContent = e.message;
@@ -329,14 +387,14 @@ async function chiudiImpostazioni() {
 
 // ---------- boot ----------
 async function init() {
-  $("tipo").replaceChildren(...Object.entries(TIPI).map(([k, t]) => el("option", { value: k }, t.label)));
   $("data").value = oggi();
   state.anno = annoDi(oggi());
-  aggiornaDurata();
+  renderPills();
 
   $("form").addEventListener("submit", salva);
   $("annulla").addEventListener("click", resetForm);
-  for (const id of ["inizio", "fine", "tipo"]) $(id).addEventListener("input", aggiornaDurata);
+  for (const id of ["inizio", "fine", "data", "classe"]) $(id).addEventListener("input", renderPills);
+  $("btn-nota").addEventListener("click", () => { mostraNota(true); $("note").focus(); });
   $("anno").addEventListener("change", (e) => { state.anno = Number(e.target.value); render(); });
   $("filtro").addEventListener("change", renderElenco);
   $("csv").addEventListener("click", esportaCsv);
