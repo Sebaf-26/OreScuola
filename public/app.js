@@ -14,7 +14,7 @@ const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "lug
 const GIORNI = ["dom", "lun", "mar", "mer", "gio", "ven", "sab"];
 
 const $ = (id) => document.getElementById(id);
-const state = { entries: [], settings: { limiteA: 40, limiteB: 40 }, anno: null, editing: null, tipo: "consiglio" };
+const state = { entries: [], settings: { limiteA: 40, limiteB: 40, classi: [] }, anno: null, editing: null, tipo: "consiglio" };
 
 // ---------- helpers ----------
 const toMin = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
@@ -206,7 +206,10 @@ function renderPills() {
     pill(t.short, state.tipo === k, () => { state.tipo = k; renderPills(); }, t.bucket)));
 
   const classe = $("classe").value.trim();
-  $("classi-pills").replaceChildren(...classiRecenti().map((c) =>
+  const mie = state.settings.classi || [];
+  $("btn-classi-form").hidden = mie.length > 0;
+  $("classe").placeholder = mie.length ? "Altra classe, non in elenco" : "Scrivi la classe, es. 3B";
+  $("classi-pills").replaceChildren(...(mie.length ? mie : classiRecenti()).map((c) =>
     pill(c, c === classe, () => { $("classe").value = c === classe ? "" : c; renderPills(); })));
 
   const data = $("data").value, o = oggi();
@@ -385,6 +388,39 @@ async function chiudiImpostazioni() {
   }
 }
 
+// ---------- le mie classi ----------
+const ordina = (xs) => [...xs].sort((a, b) => a.localeCompare(b, "it", { numeric: true }));
+
+function renderListaClassi() {
+  $("lista-classi").replaceChildren(...(state.settings.classi || []).map((c) =>
+    el("li", {}, c, el("button", { type: "button", "aria-label": `Rimuovi ${c}`, onclick: () => salvaClassi(state.settings.classi.filter((x) => x !== c)) }, "×"))));
+}
+
+async function salvaClassi(classi) {
+  try {
+    state.settings = await api("/api/settings", { method: "PUT", body: { classi: ordina(new Set(classi)) } });
+    renderListaClassi();
+    renderPills();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function aggiungiClassi() {
+  const input = $("nuova-classe");
+  const nuove = input.value.split(/[,;\n]+/).map((s) => s.trim().toUpperCase()).filter(Boolean);
+  if (!nuove.length) return;
+  input.value = "";
+  input.focus();
+  salvaClassi([...(state.settings.classi || []), ...nuove]);
+}
+
+function apriClassi() {
+  renderListaClassi();
+  $("dlg-classi").showModal();
+  $("nuova-classe").focus();
+}
+
 // ---------- boot ----------
 async function init() {
   $("data").value = oggi();
@@ -399,6 +435,10 @@ async function init() {
   $("filtro").addEventListener("change", renderElenco);
   $("csv").addEventListener("click", esportaCsv);
   $("btn-impostazioni").addEventListener("click", apriImpostazioni);
+  $("btn-classi").addEventListener("click", apriClassi);
+  $("btn-classi-form").addEventListener("click", apriClassi);
+  $("btn-aggiungi-classe").addEventListener("click", aggiungiClassi);
+  $("nuova-classe").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); aggiungiClassi(); } });
   $("dlg-impostazioni").addEventListener("close", chiudiImpostazioni);
 
   try {

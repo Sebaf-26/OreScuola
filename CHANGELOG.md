@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0] - 2026-09-26
+
+- Nuova sezione "Le mie classi" (pulsante in alto o "+ Inserisci le tue classi" nel modulo): inserisci le tue classi una volta, anche più di una insieme separandole con la virgola (es. `1A, 2A, 3B`), e le togli con ×
+- Nel modulo le classi compaiono sempre come bottoni; il campo di testo resta solo per una classe fuori elenco
+- Le classi vengono salvate sul server insieme ai limiti
+
 ## [1.1.1] - 2026-09-26
 
 - Fix: dopo un aggiornamento il browser o Cloudflare potevano servire `style.css` e `app.js` vecchi insieme all'HTML nuovo, e la pagina si rompeva (tipi in lista di testo, riepiloghi vuoti). Ora CSS e JS hanno nel link un numero di versione che cambia a ogni deploy, e l'HTML non viene mai messo in cache

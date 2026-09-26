@@ -33,7 +33,7 @@ const TYPES = {
 const pkg = JSON.parse(await readFile(join(fileURLToPath(new URL(".", import.meta.url)), "package.json"), "utf8"));
 const BUILD = `${pkg.version}-${Date.now().toString(36)}`;
 
-const DEFAULT_SETTINGS = { limiteA: 40, limiteB: 40 };
+const DEFAULT_SETTINGS = { limiteA: 40, limiteB: 40, classi: [] };
 
 let db = { entries: [], settings: { ...DEFAULT_SETTINGS } };
 try {
@@ -145,6 +145,11 @@ async function handleApi(req, res, url) {
         const n = Number(payload[key]);
         if (!Number.isFinite(n) || n < 0 || n > 200) return sendJson(res, 400, { error: `${key} non valido` });
         next[key] = Math.round(n * 100) / 100;
+      }
+      if (payload.classi !== undefined) {
+        if (!Array.isArray(payload.classi) || payload.classi.length > 60) return sendJson(res, 400, { error: "elenco classi non valido" });
+        const clean = payload.classi.map((c) => String(c).trim().slice(0, 40)).filter(Boolean);
+        next.classi = [...new Set(clean)];
       }
       db.settings = next;
       await persist();

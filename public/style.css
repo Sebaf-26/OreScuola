@@ -227,6 +227,13 @@ dialog {
 }
 dialog::backdrop { background: rgb(0 0 0 / .4); }
 dialog form { display: grid; gap: 14px; }
+.add-classe { display: flex; gap: 8px; }
+.add-classe input { flex: 1; min-width: 0; }
+.lista-classi { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.lista-classi:empty::before { content: "Nessuna classe inserita."; color: var(--muted); font-size: .9rem; }
+.lista-classi li { display: flex; align-items: center; gap: 2px; padding-left: 12px; border: 1px solid var(--line); border-radius: 99px; font-weight: 700; }
+.lista-classi button { min-height: 36px; padding: 4px 10px; background: none; border: 0; color: var(--muted); font-size: 1.1rem; line-height: 1; }
+.lista-classi button:hover { color: var(--over); }
 .dlg-text { margin: 0; color: var(--muted); font-size: .9rem; }
 
 .toast {

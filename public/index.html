@@ -23,6 +23,7 @@
       <div class="top-actions">
         <label class="sr" for="anno">Anno scolastico</label>
         <select id="anno"></select>
+        <button type="button" class="ghost" id="btn-classi" aria-haspopup="dialog">Le mie classi</button>
         <button type="button" class="ghost" id="btn-impostazioni" aria-haspopup="dialog">Limiti</button>
       </div>
     </header>
@@ -44,7 +45,8 @@
           <fieldset class="step">
             <legend><label for="classe">Classe</label></legend>
             <div class="pills" id="classi-pills"></div>
-            <input id="classe" autocomplete="off" placeholder="Scrivi una classe nuova, es. 3B" maxlength="40">
+            <button type="button" class="link" id="btn-classi-form">+ Inserisci le tue classi</button>
+            <input id="classe" autocomplete="off" placeholder="Altra classe, es. 3B" maxlength="40">
           </fieldset>
           <fieldset class="step">
             <legend>Quando</legend>
@@ -131,6 +133,22 @@
       <div class="form-buttons">
         <button type="submit" value="cancel" class="ghost">Chiudi</button>
         <button type="submit" value="ok" class="primary">Salva</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-classi" aria-labelledby="dlg-classi-title">
+    <form method="dialog" id="form-classi">
+      <h2 id="dlg-classi-title">Le mie classi</h2>
+      <p class="dlg-text">Inseriscile una volta sola: poi le trovi come bottoni quando aggiungi un impegno. Puoi scriverne più di una separandole con una virgola.</p>
+      <div class="add-classe">
+        <label class="sr" for="nuova-classe">Nuova classe</label>
+        <input id="nuova-classe" autocomplete="off" placeholder="es. 1A, 2A, 3B" maxlength="300">
+        <button type="button" class="primary" id="btn-aggiungi-classe">Aggiungi</button>
+      </div>
+      <ul class="lista-classi" id="lista-classi"></ul>
+      <div class="form-buttons">
+        <button type="submit" value="ok" class="primary">Fatto</button>
       </div>
     </form>
   </dialog>
