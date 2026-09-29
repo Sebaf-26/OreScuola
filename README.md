@@ -22,15 +22,30 @@ Poi ci sono il riepilogo per classe, l'elenco diviso per mese, i filtri, l'espor
 
 1. **Stacks → Add stack → Repository**
 2. URL: `https://github.com/Sebaf-26/OreScuola`, riferimento `refs/heads/main`, compose path `docker-compose.yml`
-3. Variabile facoltativa `PORT` (default `8092`)
+3. Variabili d'ambiente:
+
+   | Variabile | | |
+   |---|---|---|
+   | `ADMIN_USERNAME` | **obbligatoria** | nome utente per accedere |
+   | `ADMIN_PASSWORD` | **obbligatoria** | password |
+   | `PORT` | facoltativa | porta sull'host (default `8092`) |
+
 4. Deploy, poi su Nginx Proxy Manager fai puntare un host a `http://<ip-docker>:8092`
 
-Non c'è autenticazione: se lo esponi su Internet, metti un'Access List su Nginx Proxy Manager.
+## Accesso
+
+Tutta l'app è protetta da login su `/login`: senza sessione le pagine rimandano lì e l'API risponde 401.
+
+- La sessione dura 30 giorni (cookie `HttpOnly`, `SameSite=Lax`, `Secure` dietro HTTPS)
+- Cambiando `ADMIN_USERNAME` o `ADMIN_PASSWORD` e rifacendo il deploy, tutti i dispositivi vengono disconnessi
+- Dopo 5 tentativi sbagliati dallo stesso IP il login resta bloccato per 15 minuti
+- Il segreto che firma le sessioni viene generato al primo avvio in `/data/session.secret`
+- Senza `ADMIN_USERNAME` e `ADMIN_PASSWORD` il container non parte
 
 ## Sviluppo locale
 
 ```bash
-npm run dev   # http://localhost:3000, dati in ./data
+ADMIN_USERNAME=prof ADMIN_PASSWORD=prova npm run dev   # http://localhost:3000, dati in ./data
 ```
 
 ## API
@@ -41,4 +56,6 @@ npm run dev   # http://localhost:3000, dati in ./data
 | POST | `/api/entries` | `{tipo, classe, data, inizio, fine, note}` |
 | PUT | `/api/entries/:id` | modifica |
 | DELETE | `/api/entries/:id` | elimina |
-| GET/PUT | `/api/settings` | `{limiteA, limiteB}` in ore |
+| GET/PUT | `/api/settings` | `{limiteA, limiteB, classi}` |
+| POST | `/api/login` | `{username, password}`, imposta il cookie di sessione |
+| POST | `/api/logout` | cancella il cookie |

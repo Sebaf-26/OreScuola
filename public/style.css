@@ -86,7 +86,7 @@ h2 { font-size: 1.15rem; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px; }
-.top-actions { display: flex; gap: 8px; }
+.top-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* controls */
 input, select, button { font: inherit; color: inherit; }
@@ -214,6 +214,19 @@ td.tot { font-weight: 700; }
 .azioni .dur { font-weight: 700; margin-right: 6px; }
 .azioni button { min-height: 36px; padding: 4px 10px; font-size: .85rem; }
 .vuoto { color: var(--muted); margin: 0; }
+
+.login {
+  max-width: 380px;
+  margin: 0 auto;
+  padding-inline: 16px;
+  padding-block: 12vh 40px;
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+}
+.login img { border-radius: 14px; }
+.login form { width: 100%; }
+.login .primary { width: 100%; }
 
 .foot { color: var(--muted); font-size: .82rem; max-width: 65ch; }
 

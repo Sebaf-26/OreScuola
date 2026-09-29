@@ -8,6 +8,9 @@ services:
       - "${PORT:-8092}:3000"
     environment:
       - TZ=Europe/Rome
+      # Obbligatorie: senza queste il container non parte.
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     volumes:
       - orescuola-data:/data
     restart: unless-stopped

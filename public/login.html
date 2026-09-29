@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Accedi · Ore Funzionali</title>
+  <meta name="theme-color" content="#2b4c7e">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/style.css?v=__V__">
+</head>
+<body>
+  <main class="login">
+    <img src="/icon.svg" alt="" width="56" height="56">
+    <h1>Ore Funzionali</h1>
+    <form id="login" class="card" novalidate>
+      <div class="field">
+        <label for="username">Nome utente</label>
+        <input id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <p class="errore" id="errore" role="alert"></p>
+      <button type="submit" class="primary" id="entra">Accedi</button>
+    </form>
+  </main>
+  <script src="/login.js?v=__V__"></script>
+</body>
+</html>

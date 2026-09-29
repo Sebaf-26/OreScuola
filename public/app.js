@@ -59,6 +59,10 @@ async function api(path, opts = {}) {
     headers: { "Content-Type": "application/json" },
     body: opts.body ? JSON.stringify(opts.body) : undefined
   });
+  if (res.status === 401) {
+    location.replace("/login");
+    throw new Error("Sessione scaduta");
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || `Errore del server (${res.status})`);
   return data;
@@ -436,6 +440,10 @@ async function init() {
   $("csv").addEventListener("click", esportaCsv);
   $("btn-impostazioni").addEventListener("click", apriImpostazioni);
   $("btn-classi").addEventListener("click", apriClassi);
+  $("btn-esci").addEventListener("click", async () => {
+    await fetch("/api/logout", { method: "POST" }).catch(() => {});
+    location.replace("/login");
+  });
   $("btn-classi-form").addEventListener("click", apriClassi);
   $("btn-aggiungi-classe").addEventListener("click", aggiungiClassi);
   $("nuova-classe").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); aggiungiClassi(); } });

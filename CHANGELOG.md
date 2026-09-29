@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0] - 2026-09-29
+
+- Login obbligatorio su `/login`, con credenziali prese dalle variabili d'ambiente `ADMIN_USERNAME` e `ADMIN_PASSWORD`. **Senza queste variabili il container non parte**
+- Pagine e API sono protette: senza sessione le pagine rimandano a `/login` e l'API risponde 401
+- La sessione dura 30 giorni, con un cookie firmato `HttpOnly`/`SameSite=Lax`, `Secure` dietro HTTPS. Il segreto sta in `/data/session.secret`; cambiando le credenziali si disconnettono tutti i dispositivi
+- Dopo 5 tentativi sbagliati dallo stesso IP il login si blocca per 15 minuti
+- Pulsante "Esci" in alto
+
 ## [1.2.0] - 2026-09-26
 
 - Nuova sezione "Le mie classi" (pulsante in alto o "+ Inserisci le tue classi" nel modulo): inserisci le tue classi una volta, anche più di una insieme separandole con la virgola (es. `1A, 2A, 3B`), e le togli con ×
